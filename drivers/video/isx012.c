@@ -2218,6 +2218,12 @@ static int isx012_set_supported_frminterval(uint32_t fps_index,
 
         break;
 
+      case REGVAL_FPSTYPE_10FPS:
+        interval->numerator   = 1;
+        interval->denominator = 10;
+
+        break;
+
       case REGVAL_FPSTYPE_7_5FPS:
         interval->numerator   = 2;
         interval->denominator = 15;
@@ -2406,6 +2412,10 @@ static int isx012_change_fraction_to_fps(FAR struct v4l2_fract *interval)
   else if(interval->denominator == interval->numerator * 15)      /* 15FPS */
     {
       return REGVAL_FPSTYPE_15FPS;
+    }
+  else if (interval->denominator == interval->numerator * 10)     /* 10FPS */
+    {
+      return REGVAL_FPSTYPE_10FPS;
     }
   else if(interval->denominator * 10 == interval->numerator * 75) /* 7.5FPS */
     {
@@ -2808,6 +2818,18 @@ static int isx012_get_range_of_ctrlval(FAR struct v4l2_query_ext_ctrl *range)
               range->step          = 1;
               strncpy(range->name,
                       "AWB/AE status",
+                      sizeof(range->name));
+
+              break;
+
+            case V4L2_CID_SCENE_MODE:
+              range->type          = V4L2_CTRL_TYPE_INTEGER_MENU;
+              range->minimum       = 0;
+              range->maximum       = ARRAY_NENTRIES(g_isx012_scene_params);
+              range->step          = 1;
+              range->default_value = V4L2_SCENE_MODE_NONE;
+              strncpy(range->name,
+                      "Scene Mode",
                       sizeof(range->name));
 
               break;
